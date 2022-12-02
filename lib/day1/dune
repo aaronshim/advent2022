@@ -1,0 +1,5 @@
+(library
+ (name day1)
+ (libraries core str core_unix.sys_unix)
+ (inline_tests)
+ (preprocess (pps ppx_jane ppx_let)))
