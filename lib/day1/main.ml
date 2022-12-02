@@ -38,7 +38,7 @@ module Part1 = struct
   let solve input =
     input
     |> parse
-    |> List.map ~f:(List.sum (module Int) ~f:Fn.id)
+    |> List.map ~f:Shared.sum_int
     |> List.max_elt ~compare:Int.compare
   ;;
 
@@ -58,11 +58,11 @@ module Part2 = struct
     let calories =
       input
       |> parse
-      |> List.map ~f:(List.fold ~init:0 ~f:( + ))
+      |> List.map ~f:(Shared.sum_int)
       |> List.sort ~compare:Int.compare
       |> List.rev
     in
-    List.take calories 3 |> List.fold ~init:0 ~f:( + )
+    List.take calories 3 |> Shared.sum_int
   ;;
 
   let%expect_test "Solve small input" =
