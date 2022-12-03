@@ -11,4 +11,3 @@ USER gitpod
 WORKDIR /home/gitpod
 RUN whoami
 RUN pwd
-RUN opam init
