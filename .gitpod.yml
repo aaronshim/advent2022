@@ -3,7 +3,8 @@ image:
 
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
-  - init: echo "Init!"
+  - before: opam init && opam install dune core core_bench utop ocaml-lsp-server ocamlformat ppx_jane ppx_let
+    init: opam init
     # Watch for compilation errors as we go along.
     command: eval $(opam env) && dune build @runtest -w
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
