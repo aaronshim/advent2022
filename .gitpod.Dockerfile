@@ -9,5 +9,5 @@ WORKDIR /home/gitpod
 RUN whoami
 RUN pwd
 
-RUN opam init && opam install dune core core_bench utop ocaml-lsp-server ocamlformat ppx_jane ppx_let
+RUN sudo opam init && opam install dune core core_bench utop ocaml-lsp-server ocamlformat ppx_jane ppx_let
 RUN opam init
