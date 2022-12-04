@@ -27,9 +27,9 @@ let%expect_test "Parse small input" =
 ;;
 
 module Part1 = struct
-  let fully_contains l1 l2 =
-    match l1, l2 with
-    | x1 :: x2 :: [], x3 :: x4 :: [] -> (x1 <= x3 && x4 <= x2) || (x3 <= x1 && x2 <= x4)
+  let fully_contains interval1 interval2 =
+    match interval1, interval2 with
+    | [ left1; right1 ], [ left2; right2 ] -> (left1 <= left2 && right2 <= right1) || (left2 <= left1 && right1 <= right2)
     | _, _ -> false
   ;;
 
@@ -45,7 +45,9 @@ module Part1 = struct
   let solve input =
     input
     |> parse
-    |> List.filter ~f:(fun x -> fully_contains (List.nth_exn x 0) (List.nth_exn x 1))
+    |> List.map ~f:(Shared.run_on_exactly_two fully_contains)
+    |> List.filter_opt
+    |> List.filter ~f:Fun.id
     |> List.length
   ;;
 
@@ -61,9 +63,9 @@ module Part1 = struct
 end
 
 module Part2 = struct
-  let any_overlap l1 l2 =
-    match l1, l2 with
-    | x1 :: x2 :: _, x3 :: x4 :: _ -> (x1 <= x3 && x3 <= x2) || (x3 <= x1 && x1 <= x4)
+  let any_overlap interval1 interval2 =
+    match interval1, interval2 with
+    | [ left1; right1 ], [ left2; right2 ] -> (left1 <= left2 && left2 <= right1) || (left2 <= left1 && left1 <= right2)
     | _, _ -> false
   ;;
 
@@ -78,7 +80,9 @@ module Part2 = struct
   let solve input =
     input
     |> parse
-    |> List.filter ~f:(fun x -> any_overlap (List.nth_exn x 0) (List.nth_exn x 1))
+    |> List.map ~f:(Shared.run_on_exactly_two any_overlap)
+    |> List.filter_opt
+    |> List.filter ~f:Fun.id
     |> List.length
   ;;
 
