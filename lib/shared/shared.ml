@@ -22,3 +22,10 @@ let%expect_test "run_on_exactly_two (not two)" =
   print_s [%sexp (run_on_exactly_two ( + ) [ 1; 2; 3 ] : int option)];
   [%expect {| () |}]
 ;;
+
+let string_to_chars s = List.init (String.length s) ~f:(String.get s)
+
+let%expect_test "string_to_chars" =
+  print_s [%sexp (string_to_chars "abc" : char list)];
+  [%expect {| (a b c) |}]
+;;

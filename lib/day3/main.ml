@@ -15,8 +15,7 @@ let parse input =
   input
   |> String.split_lines
   |> List.map ~f:String.strip
-  (* String to a list of chars *)
-  |> List.map ~f:(fun s -> List.init (String.length s) ~f:(String.get s))
+  |> List.map ~f:Shared.string_to_chars
 ;;
 
 let%expect_test "Parse small input" =
