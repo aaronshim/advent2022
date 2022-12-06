@@ -10,32 +10,17 @@ let%expect_test "Parse small input" =
     (m j q j p q m g b l j s p h d z t n v j f q w r c g s m l b) |}]
 ;;
 
-let rec check_four i xs =
-  if i + 4 >= List.length xs
-  then -1
-  else if i + 4 < List.length xs
-          && Set.length
-               (Char.Set.of_list
-                  [ List.nth_exn xs i
-                  ; List.nth_exn xs (i + 1)
-                  ; List.nth_exn xs (i + 2)
-                  ; List.nth_exn xs (i + 3)
-                  ])
-             = 4
-  then i + 4
-  else check_four (i + 1) xs
-;;
-
 let rec check_n n i xs =
   if i + n >= List.length xs
   then -1
-  else if i + n< List.length xs
+  else if i + n < List.length xs
           && Set.length (Char.Set.of_list (List.sub xs ~pos:i ~len:n)) = n
   then i + n
   else check_n n (i + 1) xs
 ;;
 
 module Part1 = struct
+  let check_four = check_n 4
   let solve input = input |> parse |> check_four 0
 
   let%expect_test "Solve small input" =
