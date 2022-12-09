@@ -76,6 +76,8 @@ let%expect_test "move_tail" =
   [%expect {| ((2 1) (1 2) (2 2) (2 2)) |}]
 ;;
 
+let s = Sexp.to_string [%sexp (0, 0 : int * int)]
+
 (** For folding. *)
 let rec f ((x_h, y_h), (x_t, y_t), visited) direction =
   if is_done_moving_in_direction direction
@@ -93,7 +95,9 @@ let rec f ((x_h, y_h), (x_t, y_t), visited) direction =
       then x_t, y_t, visited
       else (
         let x_t'', y_t'' = move_tail (x_h', y_h') (x_t, y_t) in
-        x_t'', y_t'', (x_t'', y_t'') :: visited)
+        ( x_t''
+        , y_t''
+        , String.Set.add visited (Sexp.to_string [%sexp (x_t'', y_t'' : int * int)]) ))
     in
     f ((x_h', y_h'), (x_t', y_t'), visited') direction')
 ;;
@@ -102,21 +106,18 @@ module Part1 = struct
   let solve' input =
     input
     |> parse
-    |> List.fold ~init:((0, 0), (0, 0), []) ~f
+    |> List.fold ~init:((0, 0), (0, 0), String.Set.of_list [ "(0 0)" ]) ~f
     |> Tuple3.get3
-    |> List.sort ~compare:(fun (x1, y1) (x2, y2) -> Int.compare x1 x2 + Int.compare y1 y2)
-    |> List.remove_consecutive_duplicates ~equal:(fun (x1, y1) (x2, y2) ->
-         x1 = x2 && y1 = y2)
   ;;
 
-  let solve input = input |> solve' |> List.length
+  let solve input = input |> solve' |> Set.length
 
   let%expect_test "Solve small input" =
-    print_s [%sexp (solve' small_input : (int * int) list)];
+    print_s [%sexp (solve' small_input : String.Set.t)];
     [%expect
       {|
-      ((1 0) (1 2) (2 0) (2 2) (3 2) (3 3) (4 3) (2 4) (3 0) (3 4) (4 1) (4 2)
-       (4 3)) |}]
+      ("(0 0)" "(1 0)" "(1 2)" "(2 0)" "(2 2)" "(2 4)" "(3 0)" "(3 2)" "(3 3)"
+       "(3 4)" "(4 1)" "(4 2)" "(4 3)") |}]
   ;;
 
   let%expect_test "Solve small input" =
@@ -127,6 +128,6 @@ module Part1 = struct
 
   let%expect_test "Solve full input" =
     print_s [%sexp (solve full_input : int)];
-    [%expect {| 7521 |}]
+    [%expect {| 6563 |}]
   ;;
 end
