@@ -1,5 +1,5 @@
 (library
  (name day11)
- (libraries core str core_unix.sys_unix shared)
+ (libraries core str core_unix.sys_unix shared bignum.bigint)
  (inline_tests)
  (preprocess (pps ppx_jane ppx_let)))
