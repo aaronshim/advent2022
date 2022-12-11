@@ -29,3 +29,22 @@ let%expect_test "string_to_chars" =
   print_s [%sexp (string_to_chars "abc" : char list)];
   [%expect {| (a b c) |}]
 ;;
+
+(* All ints in the string get returned. *)
+let extract_ints str =
+  str
+  |> string_to_chars
+  |> List.group ~break:(fun a b ->
+       (Char.is_digit a && not (Char.is_digit b))
+       || (Char.is_digit b && not (Char.is_digit a)))
+  |> List.filter ~f:(List.for_all ~f:Char.is_digit)
+  |> List.map ~f:(fun xs -> xs |> String.of_char_list |> Int.of_string)
+;;
+
+let%expect_test "extract_ints" =
+  print_s
+    [%sexp
+      (List.map ~f:extract_ints [ "32;"; "1 + 2 = 3"; "Hello there 1 and 21" ]
+        : int list list)];
+  [%expect {| ((32) (1 2 3) (1 21)) |}]
+;;
