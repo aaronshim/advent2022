@@ -1,3 +1,4 @@
+open Big_int
 open Core
 
 let small_input =
@@ -37,7 +38,10 @@ type operation =
   | TimesOld
 [@@deriving sexp]
 
-type monkey = int list * operation * int * int * int * int [@@deriving sexp]
+let sexp_of_big_int (n : big_int) = Sexp.Atom (string_of_big_int n)
+let big_int_of_sexp (_ : Sexp.t) = zero_big_int
+
+type monkey = big_int list * operation * int * int * int * int [@@deriving sexp]
 
 let full_input = Stdio.In_channel.read_all "/workspace/advent2022/data/day11.txt"
 
@@ -58,7 +62,7 @@ let parse_op line =
 
 let parse_monkey lines : monkey =
   let _id = List.nth_exn lines 0 |> Shared.extract_ints |> List.hd_exn in
-  let items = List.nth_exn lines 1 |> Shared.extract_ints in
+  let items = List.nth_exn lines 1 |> Shared.extract_ints |> List.map ~f:big_int_of_int in
   let op = List.nth_exn lines 2 |> parse_op |> Option.value_exn in
   let test = List.nth_exn lines 3 |> Shared.extract_ints |> List.hd_exn in
   let test_true = List.nth_exn lines 4 |> Shared.extract_ints |> List.hd_exn in
@@ -109,13 +113,17 @@ let process_monkey (divide_by_3 : bool) (monkeys : monkey array) (i : int) : mon
     | item :: items' ->
       let worry_level =
         match op with
-        | Plus n -> item + n
-        | Times n -> item * n
-        | PlusOld -> item + item
-        | TimesOld -> item * item
+        | Plus n -> add_int_big_int n item
+        | Times n -> mult_int_big_int n item
+        | PlusOld -> add_big_int item item
+        | TimesOld -> mult_big_int item item
       in
-      let worry_level' = if divide_by_3 then worry_level / 3 else worry_level in
-      let worry_level_check = worry_level' % test = 0 in
+      let worry_level' =
+        if divide_by_3 then div_big_int worry_level (big_int_of_int 3) else worry_level
+      in
+      let worry_level_check =
+        eq_big_int (mod_big_int worry_level' (big_int_of_int test)) zero_big_int
+      in
       let next_monkey = if worry_level_check then test_true else test_false in
       let items2, op2, test2, test_true2, test_false2, num_inspected2 =
         monkeys.(next_monkey)
@@ -136,7 +144,7 @@ let%expect_test "First monkey goes" =
   print_s
     [%sexp
       (small_input |> parse |> (fun x -> process_monkey true x 0) |> display_monkeys
-        : int list array)];
+        : big_int list array)];
   [%expect {|
     (() (54 65 75 74) (79 60 97) (74 500 620)) |}]
 ;;
@@ -152,7 +160,7 @@ let%expect_test "Turn of monkeys" =
   print_s
     [%sexp
       (small_input |> parse |> do_turn_of_monkeys true |> display_monkeys
-        : int list array)];
+        : big_int list array)];
   [%expect {|
     ((20 23 27 26) (2080 25 167 207 401 1046) () ()) |}]
 ;;
