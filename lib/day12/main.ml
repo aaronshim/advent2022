@@ -36,16 +36,6 @@ let in_bounds (grid : 'a array array) ((x, y) : int * int) : bool =
   x >= 0 && x < Array.length grid && y >= 0 && y < Array.length grid.(0)
 ;;
 
-(** Functiorize int * int so that we can make a Set out of it. *)
-module Tuple = struct
-  module T = struct
-    type t = int * int [@@deriving compare, sexp]
-  end
-
-  include T
-  include Comparable.Make (T)
-end
-
 let rec bfs targets grid visited q ~up =
   (* print_s [%sexp (q : (int * int * int) Queue.t)]; *)
   if Queue.length q = 0
@@ -82,7 +72,7 @@ let%expect_test "Parse small input" =
   let grid = parse small_input in
   print_s
     [%sexp
-      (bfs ~up:true [ 'E' ] grid Tuple.Set.empty (Queue.of_list [ 0, 0, 0 ]) : int option)];
+      (bfs ~up:true [ 'E' ] grid Shared.Tuple.Set.empty (Queue.of_list [ 0, 0, 0 ]) : int option)];
   [%expect {|
     (31) |}]
 ;;
@@ -102,7 +92,7 @@ module Part1 = struct
   let solve input =
     let grid = parse input in
     match find_in_grid 'S' grid with
-    | Some (x, y) -> bfs ~up:true [ 'E' ] grid Tuple.Set.empty (Queue.of_list [ x, y, 0 ])
+    | Some (x, y) -> bfs ~up:true [ 'E' ] grid Shared.Tuple.Set.empty (Queue.of_list [ x, y, 0 ])
     | None -> None
   ;;
 
@@ -124,7 +114,7 @@ module Part2 = struct
     let grid = parse input in
     match find_in_grid 'E' grid with
     | Some (x, y) ->
-      bfs ~up:false [ 'S'; 'a' ] grid Tuple.Set.empty (Queue.of_list [ x, y, 0 ])
+      bfs ~up:false [ 'S'; 'a' ] grid Shared.Tuple.Set.empty (Queue.of_list [ x, y, 0 ])
     | None -> None
   ;;
 

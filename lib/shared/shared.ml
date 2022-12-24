@@ -48,3 +48,21 @@ let%expect_test "extract_ints" =
         : int list list)];
   [%expect {| ((32) (1 2 3) (1 21)) |}]
 ;;
+
+(** Functiorize int * int so that we can make a Set out of it. *)
+module Tuple = struct
+  module T = struct
+    type t = int * int [@@deriving compare, sexp]
+  end
+
+  include T
+  include Comparable.Make (T)
+end
+
+
+let remove_first_and_last xs = xs |> List.tl_exn |> List.rev |> List.tl_exn |> List.rev
+
+let%expect_test "remove_first_and_last" =
+  print_s [%sexp (remove_first_and_last [1; 2; 3; 4; 5] : int list)];
+  [%expect {| (2 3 4) |}]
+;;

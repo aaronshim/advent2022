@@ -32,7 +32,6 @@ type elem =
 [@@deriving sexp]
 
 let full_input = Stdio.In_channel.read_all "/workspace/advent2022/data/day13.txt"
-let remove_first_and_last xs = xs |> List.tl_exn |> List.rev |> List.tl_exn |> List.rev
 
 let split_each_line line =
   line
@@ -40,7 +39,7 @@ let split_each_line line =
   |> List.group ~break:(fun a b -> not (Char.is_digit a && Char.is_digit b))
   |> List.filter ~f:(fun a -> not (List.equal Char.equal a [ ',' ]))
   |> List.map ~f:String.of_char_list
-  |> remove_first_and_last
+  |> Shared.remove_first_and_last
 ;;
 
 let%expect_test "Split each line" =
